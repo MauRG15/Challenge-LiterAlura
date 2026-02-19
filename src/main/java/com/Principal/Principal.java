@@ -3,12 +3,16 @@ package com.Principal;
 import com.API.*;
 import com.modelo.Autor;
 import com.modelo.Libro;
+import com.repositorios.AutorRepository;
+import com.repositorios.LibroRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Principal {
+public class Principal implements CommandLineRunner {
     private Scanner lectura = new Scanner(System.in);
     private ApiComunicador comunicador = new ApiComunicador();
     private ConvierteDatos conversor = new ConvierteDatos();
@@ -16,6 +20,16 @@ public class Principal {
     private List<Libro> librosBuscados = new ArrayList<>();
     private List<Autor> autoresRegistrados = new ArrayList<>();
 
+    @Autowired
+    private AutorRepository autorRepository;
+
+    @Autowired
+    private LibroRepository libroRepository;
+
+    @Override
+    public void run(String... args) {
+        muestraElMenu();
+    }
 
     public void muestraElMenu() {
         var opcion = -1;
@@ -80,34 +94,33 @@ public class Principal {
             DatosLibro datosLibro = datos.resultados().get(0);
 
             // ===== AUTOR =====
-            Autor autorObj = null;
-            String nombreAutor = "Autor desconocido";
+            Autor autor = null;
 
             if (!datosLibro.autores().isEmpty()) {
 
                 DatosAutor datosAutor = datosLibro.autores().get(0);
 
-                nombreAutor = datosAutor.nombre();
+                // 🔎 Buscar si el autor ya existe en la base
+                autor = autorRepository.findAll()
+                        .stream()
+                        .filter(a -> a.getNombre().equalsIgnoreCase(datosAutor.nombre()))
+                        .findFirst()
+                        .orElse(null);
 
-                autorObj = new Autor(
-                        datosAutor.nombre(),
-                        datosAutor.fechaDeNacimiento(),
-                        datosAutor.fechaDeFallecimiento()
-                );
+                // Si no existe, lo creamos
+                if (autor == null) {
+                    autor = new Autor(
+                            datosAutor.nombre(),
+                            datosAutor.fechaDeNacimiento(),
+                            datosAutor.fechaDeFallecimiento()
+                    );
 
-                // Evitar duplicados
-                boolean existe = autoresRegistrados.stream()
-                        .anyMatch(a -> a.getNombre().equalsIgnoreCase(datosAutor.nombre()));
-
-
-                if (!existe) {
-                    autoresRegistrados.add(autorObj);
+                    autorRepository.save(autor);
                 }
             }
 
             // ===== IDIOMA =====
             String idioma = "Desconocido";
-
             if (!datosLibro.idiomas().isEmpty()) {
                 idioma = datosLibro.idiomas().get(0);
             }
@@ -115,15 +128,16 @@ public class Principal {
             // ===== CREAR LIBRO =====
             Libro libro = new Libro(
                     datosLibro.titulo(),
-                    nombreAutor,
                     idioma,
-                    datosLibro.numeroDeDescargas()
+                    datosLibro.numeroDeDescargas(),
+                    autor
             );
 
-            librosBuscados.add(libro);
+            libroRepository.save(libro);
 
-            System.out.println("Libro guardado:");
+            System.out.println("Libro guardado en base de datos:");
             System.out.println(libro);
+
         }
     }
 
@@ -158,7 +172,7 @@ public class Principal {
         lectura.nextLine();
 
         autoresRegistrados.stream()
-                .filter(a -> a.estaVivoEnAnio(ano))
+                .filter(a -> a.estaVivoEnAno(ano))
                 .forEach(System.out::println);
     }
 
