@@ -11,14 +11,18 @@ import org.springframework.boot.CommandLineRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Principal implements CommandLineRunner {
     private Scanner lectura = new Scanner(System.in);
     private ApiComunicador comunicador = new ApiComunicador();
     private ConvierteDatos conversor = new ConvierteDatos();
     private final String URL_BASE = "https://gutendex.com/books/";
-    private List<Libro> librosBuscados = new ArrayList<>();
-    private List<Autor> autoresRegistrados = new ArrayList<>();
+
+    //USO DE LISTAS
+    //private List<Libro> librosBuscados = new ArrayList<>();
+    //private List<Autor> autoresRegistrados = new ArrayList<>();
 
     @Autowired
     private AutorRepository autorRepository;
@@ -142,27 +146,37 @@ public class Principal implements CommandLineRunner {
     }
 
     private void listarLibros() {
-        if (librosBuscados.isEmpty()) {
+
+        List<Libro> libros = libroRepository.findAll();
+
+        if (libros.isEmpty()) {
             System.out.println("No hay libros registrados.");
         } else {
-            librosBuscados.forEach(System.out::println);
+            libros.forEach(System.out::println);
         }
     }
+
 
     private void listarPorIdioma() {
         System.out.println("Ingrese el idioma (ej: en, es, fr):");
         String idioma = lectura.nextLine();
 
-        librosBuscados.stream()
+        List<Libro> libros = libroRepository.findAll();
+
+        libros.stream()
                 .filter(l -> l.getIdioma().equalsIgnoreCase(idioma))
                 .forEach(System.out::println);
     }
 
+
     private void listarAutores() {
-        if (autoresRegistrados.isEmpty()) {
+
+        List<Autor> autores = autorRepository.findAll();
+
+        if (autores.isEmpty()) {
             System.out.println("No hay autores registrados.");
         } else {
-            autoresRegistrados.forEach(System.out::println);
+            autores.forEach(System.out::println);
         }
     }
 
@@ -171,11 +185,10 @@ public class Principal implements CommandLineRunner {
         int ano = lectura.nextInt();
         lectura.nextLine();
 
-        autoresRegistrados.stream()
+        List<Autor> autores = autorRepository.findAll();
+
+        autores.stream()
                 .filter(a -> a.estaVivoEnAno(ano))
                 .forEach(System.out::println);
     }
-
-
-
 }
