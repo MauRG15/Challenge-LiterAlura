@@ -1,4 +1,4 @@
-package com.modelo;
+package com.LiterAlura.modelo;
 
 import jakarta.persistence.*;
 
@@ -70,13 +70,18 @@ public class Libro {
     @Override
     public String toString() {
         return """
-                -----------------------
-                Título: %s
-                Autor: %s
-                Idioma: %s
-                Descargas: %d
-                -----------------------
-                """.formatted(titulo, autor, idioma, numeroDescargas);
+            -----------------------
+            Título: %s
+            Autor: %s
+            Idioma: %s
+            Descargas: %d
+            -----------------------
+            """.formatted(
+                titulo,
+                autor != null ? autor.getNombre() : "Desconocido",
+                idioma,
+                numeroDescargas
+        );
     }
 }
 

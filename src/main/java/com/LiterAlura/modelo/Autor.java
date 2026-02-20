@@ -1,4 +1,4 @@
-package com.modelo;
+package com.LiterAlura.modelo;
 
 
 import jakarta.persistence.*;
@@ -49,13 +49,22 @@ public class Autor {
     }
 
     public boolean estaVivoEnAno(int ano) {
-        if (fechaNacimiento == null) return false;
 
-        if (fechaFallecimiento == null) {
-            return ano >= fechaNacimiento;
+        // Si no tiene fecha de nacimiento pero tampoco fallecimiento,
+        // asumimos que sigue activo
+        if (fechaNacimiento == null && fechaFallecimiento == null) {
+            return true;
         }
 
-        return ano >= fechaNacimiento && ano <= fechaFallecimiento;
+        if (fechaNacimiento != null && fechaNacimiento > ano) {
+            return false;
+        }
+
+        if (fechaFallecimiento == null) {
+            return true;
+        }
+
+        return fechaFallecimiento >= ano;
     }
 
     @Override

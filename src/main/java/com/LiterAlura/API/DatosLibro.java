@@ -1,4 +1,4 @@
-package com.API;
+package com.LiterAlura.API;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;

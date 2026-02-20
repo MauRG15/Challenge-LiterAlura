@@ -1,14 +1,13 @@
-package com.Principal;
+package com.LiterAlura.Principal;
 
-import com.API.*;
-import com.modelo.Autor;
-import com.modelo.Libro;
-import com.repositorios.AutorRepository;
-import com.repositorios.LibroRepository;
+import com.LiterAlura.API.*;
+import com.LiterAlura.modelo.Autor;
+import com.LiterAlura.modelo.Libro;
+import com.LiterAlura.repositorios.AutorRepository;
+import com.LiterAlura.repositorios.LibroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import org.springframework.stereotype.Component;
@@ -36,23 +35,23 @@ public class Principal implements CommandLineRunner {
     }
 
     public void muestraElMenu() {
-        var opcion = -1;
-        while (opcion != 0) {
-            var menu = """
-                    1 - Buscar libro por título
-                    2 - Listar libros registrados
-                    3 - Listar libros por idioma
-                    4 - Listar autores
-                    5 - Listar autores vivos en determinado año
-                    
-                    0 - Salir
-                    """;
-            System.out.println(menu);
+        int opcion = -1;
 
-            // Validación de entrada numérica
+        while (opcion != 0) {
+
+            System.out.println("""
+                1 - Buscar libro por título
+                2 - Listar libros registrados
+                3 - Listar libros por idioma
+                4 - Listar autores
+                5 - Listar autores vivos en determinado año
+                6 - Mostrar estadísticas por idioma
+
+                0 - Salir
+                """);
+
             try {
-                opcion = lectura.nextInt();
-                lectura.nextLine(); // Limpiar el buffer
+                opcion = Integer.parseInt(lectura.nextLine());
 
                 switch (opcion) {
                     case 1:
@@ -70,16 +69,16 @@ public class Principal implements CommandLineRunner {
                     case 5:
                         listarAutoresVivosEnAno();
                         break;
-
                     case 0:
                         System.out.println("Cerrando la aplicación...");
                         break;
                     default:
                         System.out.println("Opción inválida");
+                        break;
                 }
-            } catch (Exception e) {
+
+            } catch (NumberFormatException e) {
                 System.out.println("Error: Por favor, ingresa un número válido.");
-                lectura.nextLine(); // Limpiar el buffer en caso de error
             }
         }
     }
@@ -96,6 +95,15 @@ public class Principal implements CommandLineRunner {
         } else {
 
             DatosLibro datosLibro = datos.resultados().get(0);
+
+            // ===== VALIDAR SI EL LIBRO YA EXISTE =====
+            var libroExistente = libroRepository
+                    .findByTituloIgnoreCase(datosLibro.titulo());
+
+            if (libroExistente.isPresent()) {
+                System.out.println("El libro ya está registrado en la base de datos.");
+                return;
+            }
 
             // ===== AUTOR =====
             Autor autor = null;
@@ -182,8 +190,14 @@ public class Principal implements CommandLineRunner {
 
     private void listarAutoresVivosEnAno() {
         System.out.println("Ingrese el año que desea consultar:");
-        int ano = lectura.nextInt();
-        lectura.nextLine();
+
+        int ano;
+        try {
+            ano = Integer.parseInt(lectura.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Año inválido.");
+            return;
+        }
 
         List<Autor> autores = autorRepository.findAll();
 

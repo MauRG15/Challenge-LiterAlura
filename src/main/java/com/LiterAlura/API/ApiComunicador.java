@@ -1,4 +1,4 @@
-package com.API;
+package com.LiterAlura.API;
 
 import java.io.IOException;
 import java.net.URI;
