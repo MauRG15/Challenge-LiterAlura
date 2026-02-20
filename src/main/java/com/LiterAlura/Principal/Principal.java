@@ -8,6 +8,7 @@ import com.LiterAlura.repositorios.LibroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import org.springframework.stereotype.Component;
@@ -192,6 +193,7 @@ public class Principal implements CommandLineRunner {
     }
 
     private void listarAutoresVivosEnAno() {
+
         System.out.println("Ingrese el año que desea consultar:");
 
         int ano;
@@ -202,11 +204,33 @@ public class Principal implements CommandLineRunner {
             return;
         }
 
-        List<Autor> autores = autorRepository.findAll();
+        List<Autor> resultado = new ArrayList<>();
 
-        autores.stream()
-                .filter(a -> a.estaVivoEnAno(ano))
-                .forEach(System.out::println);
+        // Nacimiento conocido
+        resultado.addAll(
+                autorRepository.findByFechaNacimientoLessThanEqualAndFechaFallecimientoGreaterThanEqual(ano, ano)
+        );
+
+        resultado.addAll(
+                autorRepository.findByFechaNacimientoLessThanEqualAndFechaFallecimientoIsNull(ano)
+        );
+
+        // Nacimiento desconocido
+        resultado.addAll(
+                autorRepository.findByFechaNacimientoIsNullAndFechaFallecimientoGreaterThanEqual(ano)
+        );
+
+        resultado.addAll(
+                autorRepository.findByFechaNacimientoIsNullAndFechaFallecimientoIsNull()
+        );
+
+        if (resultado.isEmpty()) {
+            System.out.println("No se encontraron autores vivos en ese año.");
+            return;
+        }
+
+        System.out.println("Autores vivos en el año " + ano + ":\n");
+        resultado.forEach(System.out::println);
     }
 
     private void mostrarEstadisticasPorIdioma() {
