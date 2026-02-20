@@ -69,6 +69,9 @@ public class Principal implements CommandLineRunner {
                     case 5:
                         listarAutoresVivosEnAno();
                         break;
+                    case 6:
+                        mostrarEstadisticasPorIdioma();
+                        break;
                     case 0:
                         System.out.println("Cerrando la aplicación...");
                         break;
@@ -204,5 +207,15 @@ public class Principal implements CommandLineRunner {
         autores.stream()
                 .filter(a -> a.estaVivoEnAno(ano))
                 .forEach(System.out::println);
+    }
+
+    private void mostrarEstadisticasPorIdioma() {
+
+        System.out.println("Ingrese idioma:");
+        String idioma = lectura.nextLine();
+
+        long cantidad = libroRepository.countByIdiomaIgnoreCase(idioma);
+
+        System.out.println("Cantidad de libros en \"" + idioma + "\": " + cantidad);
     }
 }
