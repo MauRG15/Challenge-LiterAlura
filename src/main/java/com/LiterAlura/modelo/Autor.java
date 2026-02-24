@@ -15,7 +15,6 @@ public class Autor {
     private Integer fechaNacimiento;
     private Integer fechaFallecimiento;
 
-    // 🔹 Constructor vacío obligatorio para JPA
     public Autor() {}
 
     public Autor(String nombre, Integer fechaNacimiento, Integer fechaFallecimiento) {
@@ -50,8 +49,6 @@ public class Autor {
 
     public boolean estaVivoEnAno(int ano) {
 
-        // Si no tiene fecha de nacimiento pero tampoco fallecimiento,
-        // asumimos que sigue activo
         if (fechaNacimiento == null && fechaFallecimiento == null) {
             return true;
         }

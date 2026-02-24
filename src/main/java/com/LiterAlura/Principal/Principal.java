@@ -100,7 +100,7 @@ public class Principal implements CommandLineRunner {
 
             DatosLibro datosLibro = datos.resultados().get(0);
 
-            // ===== VALIDAR SI EL LIBRO YA EXISTE =====
+            // VALIDAR SI EL LIBRO YA EXISTE
             var libroExistente = libroRepository
                     .findByTituloIgnoreCase(datosLibro.titulo());
 
@@ -109,21 +109,21 @@ public class Principal implements CommandLineRunner {
                 return;
             }
 
-            // ===== AUTOR =====
+            // AUTOR
             Autor autor = null;
 
             if (!datosLibro.autores().isEmpty()) {
 
                 DatosAutor datosAutor = datosLibro.autores().get(0);
 
-                // 🔎 Buscar si el autor ya existe en la base
+                // Buscar si el autor ya existe en la BD
                 autor = autorRepository.findAll()
                         .stream()
                         .filter(a -> a.getNombre().equalsIgnoreCase(datosAutor.nombre()))
                         .findFirst()
                         .orElse(null);
 
-                // Si no existe, lo creamos
+                // Si no existe, se crea
                 if (autor == null) {
                     autor = new Autor(
                             datosAutor.nombre(),
@@ -135,13 +135,13 @@ public class Principal implements CommandLineRunner {
                 }
             }
 
-            // ===== IDIOMA =====
+            // IDIOMA
             String idioma = "Desconocido";
             if (!datosLibro.idiomas().isEmpty()) {
                 idioma = datosLibro.idiomas().get(0);
             }
 
-            // ===== CREAR LIBRO =====
+            // CREAR LIBRO
             Libro libro = new Libro(
                     datosLibro.titulo(),
                     idioma,
